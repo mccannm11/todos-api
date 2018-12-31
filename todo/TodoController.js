@@ -6,7 +6,6 @@ const config = require('../config.js')
 
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
-const Todo = require('./Todo');
 const User = require('../user/User');
 
 
