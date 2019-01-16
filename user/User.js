@@ -1,10 +1,5 @@
 const mongoose = require('mongoose'); 
 
-// var TodoSchema = new mongoose.Schema({  
-//   title: String,
-//   completed: Boolean,
-// });
-
 const UserSchema = new mongoose.Schema({  
   name: String,
   email: { type: String, index: {unique: true}},
