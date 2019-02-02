@@ -3,7 +3,6 @@ const todoController = require('../controllers/TodoController');
 const { isAuthenticated } = require('../helpers');
 const router = express.Router();
 
-
 router.get('/', 
   isAuthenticated,
   todoController.readAll

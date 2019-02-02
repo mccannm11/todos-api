@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const config = require('./config');
 const { validationResult } = require('express-validator/check');
-  
 exports = module.exports;
 
 exports.TOKEN_EXPIRATION = 24 * 60 * 60;
@@ -23,7 +22,6 @@ exports.isAuthenticated = (req,res,next) => {
     next();
   });
 }
-
 
 exports.validationHandler = (req, res, next) => _ => {
   const errors = validationResult(req);

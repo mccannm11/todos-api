@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-
+const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const config = require('../config.js');
 const { TOKEN_EXPIRATION } = require('../helpers.js');
@@ -20,14 +20,15 @@ UserSchema.methods.validPassword = (password) => {
 
 UserSchema.methods.generateJWT = () => {
   return jwt.sign({ 
-    id: user._id,
-    expiredIn: TOKEN_EXPIRATION,
-    secret: config.secret
-  });
+    id: this._id,
+    expiredIn: TOKEN_EXPIRATION
+  },
+  config.token
+  );
 };
 
-UserSchema.methods.setPassword = () => {
-  thisbcrypt.hashSync(password, 8);
+UserSchema.methods.setPassword = (password) => {
+  this.password = bcrypt.hashSync(password, 8);
 };
 
 mongoose.model('User', UserSchema);

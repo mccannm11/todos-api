@@ -12,10 +12,10 @@ exports.validate = (method) => {
       case 'register': {
         return [ 
           check('name')
-            .not().isEmpty().withMessage('Username must not be empty.')
-          check('email','Invalid Email').exists().isEmail(),
-            .not().isEmpty().withMessage('Email must not be empty.')
-          check('password','Invalid Email').exists().isEmail(),
+            .not().isEmpty().withMessage('Username must not be empty.'),
+          check('email','Invalid Email').exists().isEmail()
+            .not().isEmpty().withMessage('Email must not be empty.'),
+          check('password','Invalid Email').exists().isEmail()
             .not().isEmpty().withMessage('Password must not be empty.')
          ]
       }
@@ -37,17 +37,17 @@ exports.validate = (method) => {
 }
 
 exports.register = (req, res, next) => {
-  const { name, email } = req.body;
+  const { name, email, password } = req.body;
   let user = new User();
 
   user.email = email;
   user.name = name;
-  user.setPassword()
+  user.setPassword(password);
 
-  user.save().then( (err, user) => {
+  user.save().then( (user, err) => {
     res.status(200).send({
       auth: true,
-      token: user.generateToken()
+      token: user.generateJWT()
     });
   }).catch(next);
 }
@@ -82,7 +82,7 @@ exports.login = (req, res, next) => {
            
           res.status(200).send({
             auth: true,
-            token: user.generateToken()
+            token: user.generateJWT()
           });
 
         })

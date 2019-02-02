@@ -4,8 +4,16 @@ const db = require('./db');
 const expressValidator = require('express-validator');
 const bodyParser = require('body-parser');
 
+const logger = (req, res, next) => {
+  console.log('Request');
+  next();
+}
+
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+app.use(logger);
 
 app.use(expressValidator());
 
