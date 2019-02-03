@@ -1,90 +1,56 @@
-
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const config = require('../config.js');
 const { validationResult, check } = require('express-validator/check');
-const { validationHandler } = require('../helpers');
-exports = module.exports;
+const { ensureUser } = require('../helpers');
 
-exports.validate = (method) => {
-  switch (method) {
-      case 'register': {
-        return [ 
-          check('name')
-            .not().isEmpty().withMessage('Username must not be empty.'),
-          check('email','Invalid Email').exists().isEmail()
-            .not().isEmpty().withMessage('Email must not be empty.'),
-          check('password','Invalid Email').exists().isEmail()
-            .not().isEmpty().withMessage('Password must not be empty.')
-         ]
-      }
-      case 'me': {
-        return [
-          check('token')
-            .not().isEmpty().withMessage('Token must not be blank'),
-        ]
-      }
-      case 'login': {
-        return [
-          check('email')
-            .not().isEmpty().withMessage('Email must not be empty.'),
-          check('password')
-            .not().isEmpty().withMessage('Password must not be empty.'),
-        ]
-      }
-  }
-}
+exports = module.exports;
 
 exports.register = (req, res, next) => {
   const { name, email, password } = req.body;
-  let user = new User();
-
-  user.email = email;
-  user.name = name;
+  let user = new User({name, email});
   user.setPassword(password);
-
+  
   user.save().then( (user, err) => {
-    res.status(200).send({
+    res.status(201).send({
       auth: true,
-      token: user.generateJWT()
+      token: user.generateJWT(user._id)
     });
   }).catch(next);
 }
 
 exports.me = (req, res) => {
+  const token = req.headers['x-access-token'];
+
   jwt.verify(token, config.secret, (err, decoded) => {
-    if (err) return res.status(500).send({
+    if (err) return res.status(401).send({
       auth: false,
       message: 'Failed to authenticate token.'
     });
-    
-    res.status(200).send(decoded);
+    User.findOne().where({_id: decoded.id}).exec((err, user) => {
+      if (!user) return res.status(404).send({
+        message:'User not found.'
+      });
+      res.send(user);
+    })
   });
 }
 
 exports.login = (req, res, next) => {
-    req
-     .getValidationResult()
-     .then(validationHandler(req, res, next))
-     .then( _ => {
-        const { email, password } = req.body;
+  const { email, password } = req.body;
 
-        User.findOne({ email: email }).select('password').then( (err,user) => {
-          if (!user) return res.status(404).send({
-            message:'User not found.'
-          });
+  User.findOne({email: email}).select('password').then( (user, err) => {
+    if (!ensureUser(err, user, res)) return;
 
-          if (user.validPassword(password)) return res.status(401).send({
-            auth: false,
-            token: null
-          });
-           
-          res.status(200).send({
-            auth: true,
-            token: user.generateJWT()
-          });
-
-        })
-  }).catch(next);
+    if (!user.validPassword(password)) return res.status(401).send({
+      auth: false,
+      token: null
+    });
+     
+    res.status(200).send({
+      auth: true,
+      token: user.generateJWT(user._id)
+    });
+  })
 }

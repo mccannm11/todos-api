@@ -5,10 +5,9 @@ const expressValidator = require('express-validator');
 const bodyParser = require('body-parser');
 
 const logger = (req, res, next) => {
-  console.log('Request');
+  // code for logging here
   next();
 }
-
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

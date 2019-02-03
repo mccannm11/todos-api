@@ -1,3 +1,3 @@
 module.exports = {
-  token: 'make this your JWT secret key'
+  secret: 'make this your JWT secret key'
 }
