@@ -1,12 +1,12 @@
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const mongoose = require("mongoose");
-const config = require("../config.js");
-const { TOKEN_EXPIRATION } = require("../helpers.js");
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
+import config from "../config";
+import { TOKEN_EXPIRATION } from "../helpers";
 
 const UserSchema = new mongoose.Schema({
   name: { type: String, select: true },
-  email: { type: String, index: { unique: true } },
+  email: { type: String, unique: true },
   password: { type: String, select: false },
   todos: [
     {
@@ -35,5 +35,6 @@ UserSchema.methods.setPassword = async function(password) {
 };
 
 mongoose.model("User", UserSchema);
+const User = mongoose.model("User");
 
-module.exports = mongoose.model("User");
+export default User;

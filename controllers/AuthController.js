@@ -1,15 +1,9 @@
-const User = require("../models/User");
-exports = module.exports;
+import { handleMongooseError } from "../helpers";
+import User from "../models/User";
 
-const handleMongooseError = res => error => {
-  if (error.name === "MongoError") {
-    res.status(422).send("Invalid");
-  } else {
-    res.status(500).send("There was a fatal error");
-  }
-};
+const AuthController = {};
 
-exports.register = async (req, res, next) => {
+AuthController.register = async (req, res, next) => {
   const { name, email, password } = req.body;
   let user = new User({ name, email });
   await user.setPassword(password);
@@ -17,7 +11,8 @@ exports.register = async (req, res, next) => {
   try {
     user = await user.save();
   } catch (error) {
-    handleMongooseError(error);
+    handleMongooseError(error, res);
+    return;
   }
 
   res.status(201).send({
@@ -26,7 +21,7 @@ exports.register = async (req, res, next) => {
   });
 };
 
-exports.me = async (req, res) => {
+AuthController.me = async (req, res) => {
   let user;
 
   try {
@@ -34,30 +29,37 @@ exports.me = async (req, res) => {
       .where({ _id: req.user_id })
       .exec();
   } catch (error) {
-    handleMongooseError(error);
+    handleMongooseError(error, res);
   }
 
   res.status(200).send(user);
 };
 
-exports.login = (req, res, next) => {
+AuthController.login = async (req, res, next) => {
   const { email, password } = req.body;
+  let user;
 
-  User.findOne()
-    .where({ email: email })
-    .select({ password: 1 })
-    .exec()
-    .then(user => {
-      if (!user.checkPassword(password))
-        return res.status(401).send({
-          auth: false,
-          token: null
-        });
+  try {
+    user = await User.findOne()
+      .where({ email: email })
+      .select({ password: 1 })
+      .exec();
+  } catch (error) {
+    handleMongooseError(error, res);
+    return;
+  }
 
-      res.status(200).send({
-        auth: true,
-        token: user.generateJWT(user._id)
-      });
-    })
-    .catch(handleMongooseError(res));
+  if (!user.checkPassword(password)) {
+    return res.status(401).send({
+      auth: false,
+      token: null
+    });
+  }
+
+  res.status(200).send({
+    auth: true,
+    token: user.generateJWT(user._id)
+  });
 };
+
+export default AuthController;

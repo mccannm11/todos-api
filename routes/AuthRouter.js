@@ -1,8 +1,9 @@
-const express = require("express");
-const authController = require("../controllers/AuthController");
+import express from "express";
+import AuthController from "../controllers/AuthController";
+import { check } from "express-validator/check";
+import { validationHandler, isAuthenticated } from "../helpers";
+
 const router = express.Router();
-const { check } = require("express-validator/check");
-const { validationHandler, isAuthenticated } = require("../helpers");
 
 router.post(
   "/register",
@@ -24,7 +25,7 @@ router.post(
       .withMessage("Password must be 6 characters long")
   ],
   validationHandler,
-  authController.register
+  AuthController.register
 );
 
 router.get(
@@ -38,7 +39,7 @@ router.get(
   ],
   validationHandler,
   isAuthenticated,
-  authController.me
+  AuthController.me
 );
 
 router.post(
@@ -54,7 +55,7 @@ router.post(
       .withMessage("Password must not be empty.")
   ],
   validationHandler,
-  authController.login
+  AuthController.login
 );
 
-module.exports = router;
+export default router

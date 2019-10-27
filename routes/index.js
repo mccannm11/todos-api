@@ -1,10 +1,10 @@
-const authRouter = require("./authRouter");
-const todoRouter = require("./todoRouter");
+import AuthRouter from "./AuthRouter";
+import TodoRouter from "./TodoRouter";
 
 const express = require("express");
 const router = express.Router();
 
-router.use("/todos", todoRouter);
-router.use("/auth", authRouter);
+router.use("/todos", TodoRouter);
+router.use("/auth", AuthRouter);
 
-module.exports = router;
+export default router

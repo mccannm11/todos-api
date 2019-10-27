@@ -1,14 +1,15 @@
-const express = require("express");
-const router = express.Router();
-const todoController = require("../controllers/TodoController");
+import express from "express";
+import TodoController from "../controllers/TodoController"
 const { validationHandler, isAuthenticated, hasToken } = require("../helpers");
+
+const router = express.Router();
 
 router.get(
   "/",
   [hasToken],
   validationHandler,
   isAuthenticated,
-  todoController.readAll
+  TodoController.readAll
 );
 
 router.get(
@@ -16,7 +17,7 @@ router.get(
   [hasToken],
   validationHandler,
   isAuthenticated,
-  todoController.readOne
+  TodoController.readOne
 );
 
 router.post(
@@ -24,7 +25,7 @@ router.post(
   [hasToken],
   validationHandler,
   isAuthenticated,
-  todoController.create
+  TodoController.create
 );
 
 router.delete(
@@ -32,7 +33,7 @@ router.delete(
   [hasToken],
   validationHandler,
   isAuthenticated,
-  todoController.delete
+  TodoController.delete
 );
 
 router.put(
@@ -40,7 +41,7 @@ router.put(
   [hasToken],
   validationHandler,
   isAuthenticated,
-  todoController.update
+  TodoController.update
 );
 
-module.exports = router;
+export default router

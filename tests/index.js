@@ -1,4 +1,3 @@
-const request = require("supertest");
 const app = require("../app");
 const mongoose = require("mongoose");
 const fixtures = require("./fixtures");
@@ -10,14 +9,11 @@ before(done => {
   done();
 });
 
-beforeEach(done => {
-  User.deleteMany({}, err => {
-    user = new User(fixtures.users[0]);
-    user.setPassword(fixtures.users[0].password);
-    user.save((err, user) => {
-      if (!err) done();
-    });
-  });
+beforeEach(async () => {
+  await User.deleteMany({});
+  user = new User(fixtures.users[0]);
+  user.setPassword(fixtures.users[0].password);
+  await user.save();
 });
 
 after(done => {
