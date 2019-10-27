@@ -8,4 +8,6 @@ const options = {
   useFindAndModify: false
 };
 
+mongoose.Promise = global.Promise;
+
 module.exports = mongoose.connect(url + node_env, options);
